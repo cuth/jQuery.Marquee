@@ -121,6 +121,15 @@
                 }
             });
 
+            // the duplicated option is deprecated for duplicate to set how many times it should duplicate
+            // for legacy, set duplicate to 1 if duplicated is true
+            if (o.duplicate === 0 && o.duplicated) {
+                o.duplicate = 1;
+            }
+            if (o.duplicate > 0) {
+                o.duplicated = true;
+            }
+
             //since speed option is changed to duration, to support speed for those who are already using it
             o.duration = o.speed || o.duration;
 
@@ -139,7 +148,7 @@
                 'float': 'left'
             });
 
-            if (o.duplicated) {
+            for (var d = 0; d < o.duplicate; d++) {
                 $el.clone(true).appendTo($this);
             }
 
@@ -187,7 +196,7 @@
 
             //if duplicated than reduce the speed
             if (o.duplicated) {
-                o.duration = o.duration / 2;
+                o.duration = o.duration / (o.duplicate * .5 + 1);
             }
 
             if (o.allowCss3Support) {
@@ -234,9 +243,9 @@
             //if duplicated option is set to true than position the wrapper
             if (o.duplicated) {
                 if (verticalDir) {
-                    $marqueeWrapper.css('margin-top', o.direction == 'up' ? containerHeight + 'px' : '-' + ((elHeight * 2) - o.gap) + 'px');
+                    $marqueeWrapper.css('margin-top', o.direction == 'up' ? containerHeight + 'px' : '-' + ((elHeight * (o.duplicate + 1)) - o.gap) + 'px');
                 } else {
-                    $marqueeWrapper.css('margin-left', o.direction == 'left' ? containerWidth + 'px' : '-' + ((elWidth * 2) - o.gap) + 'px');
+                    $marqueeWrapper.css('margin-left', o.direction == 'left' ? containerWidth + 'px' : '-' + ((elWidth * (o.duplicate + 1)) - o.gap) + 'px');
                 }
                 loopCount = 1;
             } else {
@@ -254,9 +263,9 @@
                     if (loopCount === 1) {
                         o._originalDuration = o.duration;
                         if (verticalDir) {
-                            o.duration = o.direction == 'up' ? o.duration + (containerHeight / ((elHeight) / o.duration)) : o.duration * 2;
+                            o.duration = o.direction == 'up' ? o.duration + (containerHeight / ((elHeight) / o.duration)) : o.duration * (o.duplicate + 1);
                         } else {
-                            o.duration = o.direction == 'left' ? o.duration + (containerWidth / ((elWidth) / o.duration)) : o.duration * 2;
+                            o.duration = o.direction == 'left' ? o.duration + (containerWidth / ((elWidth) / o.duration)) : o.duration * (o.duplicate + 1);
                         }
                         //Adjust the css3 animation as well
                         if (animationCss3Str) {
@@ -389,8 +398,10 @@
         delayBeforeStart: 1000,
         //'left', 'right', 'up' or 'down'
         direction: 'left',
-        //true or false - should the marquee be duplicated to show an effect of continues flow
+        //true or false - should the marquee be duplicated to show an effect of continues flow DEPRECATED
         duplicated: false,
+        //duplicate the marquee this many times
+        duplicate: 0,
         //speed in milliseconds of the marquee in milliseconds
         duration: 5000,
         //gap in pixels between the tickers
